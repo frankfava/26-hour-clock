@@ -11,17 +11,19 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
+            padding: 20px;
         }
-        .clock-container {
+        .clock-container, .explanation {
             text-align: center;
             margin: 20px;
             padding: 20px;
             background-color: white;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 600px;
         }
         .clock {
             font-size: 2.5em;
@@ -31,9 +33,22 @@
             font-size: 1.2em;
             color: #666;
         }
+        .explanation p {
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+        #hoursGained {
+            font-weight: bold;
+            color: #2c3e50;
+        }
     </style>
 </head>
 <body>
+    <div class="explanation">
+        <h2>About the 26-Hour Clock</h2>
+        <p>This clock shows a 26-hour day instead of the standard 24-hour day, running 1.083333 times faster than normal time. While there are still 12 months in a year, this system adds approximately 730 extra hours per year, which converts to about 30.42 extra days.</p>
+        <p id="hoursGained">Hours gained in 2025 so far: Calculating...</p>
+    </div>
     <div class="clock-container">
         <div class="label">26-Hour Clock</div>
         <div class="clock" id="clock26">00:00:00</div>
@@ -44,28 +59,43 @@
     </div>
 
     <script>
-        function updateClocks() {
-            const now = new Date();
-            
-            // Normal 24-hour clock
-            const hours24 = String(now.getHours()).padStart(2, '0');
-            const minutes24 = String(now.getMinutes()).padStart(2, '0');
-            const seconds24 = String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('clock24').textContent = `${hours24}:${minutes24}:${seconds24}`;
+        function formatTime(hours, minutes, seconds) {
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
 
-            // 26-hour clock running 1.08333333 times faster
-            const totalSeconds = (now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()) * 1.08333333;
+        function update24Clock() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+            document.getElementById('clock24').textContent = formatTime(hours, minutes, seconds);
+        }
+
+        function update26Clock() {
+            const now = new Date();
+            const totalSeconds = (now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()) * (26/24);
             const hours26 = Math.floor(totalSeconds / 3600) % 26;
             const minutes26 = Math.floor((totalSeconds % 3600) / 60);
             const seconds26 = Math.floor(totalSeconds % 60);
-            
-            document.getElementById('clock26').textContent = 
-                `${String(hours26).padStart(2, '0')}:${String(minutes26).padStart(2, '0')}:${String(seconds26).padStart(2, '0')}`;
+            document.getElementById('clock26').textContent = formatTime(hours26, minutes26, seconds26);
         }
 
-        // Update clocks every second
-        setInterval(updateClocks, 1000);
-        updateClocks(); // Initial call
+        function updateHoursGained() {
+            const now = new Date(2025, 2, 26); // March 26, 2025
+            const yearStart = new Date(2025, 0, 1); // January 1, 2025
+            const daysPassed = (now - yearStart) / (1000 * 60 * 60 * 24);
+            const hoursGained = Math.round(daysPassed * 2); // 2 hours gained per day (26-24)
+            const daysGained = (hoursGained / 24).toFixed(2); // Convert hours to days, 2 decimal places
+            document.getElementById('hoursGained').textContent = 
+                `Hours gained in 2025 so far: ${hoursGained} hours (${daysGained} days) as of March 26, 2025`;
+        }
+
+        // Update clocks and hours gained
+        setInterval(update24Clock, 1000);
+        setInterval(update26Clock, Math.round(1000 / 1.083333));
+        update24Clock();
+        update26Clock();
+        updateHoursGained();
     </script>
 </body>
 </html>
