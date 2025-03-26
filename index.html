@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>26-Hour Clock</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .clock-container {
+            text-align: center;
+            margin: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .clock {
+            font-size: 2.5em;
+            margin: 10px 0;
+        }
+        .label {
+            font-size: 1.2em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="clock-container">
+        <div class="label">26-Hour Clock</div>
+        <div class="clock" id="clock26">00:00:00</div>
+    </div>
+    <div class="clock-container">
+        <div class="label">24-Hour Clock</div>
+        <div class="clock" id="clock24">00:00:00</div>
+    </div>
+
+    <script>
+        function updateClocks() {
+            const now = new Date();
+            
+            // Normal 24-hour clock
+            const hours24 = String(now.getHours()).padStart(2, '0');
+            const minutes24 = String(now.getMinutes()).padStart(2, '0');
+            const seconds24 = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('clock24').textContent = `${hours24}:${minutes24}:${seconds24}`;
+
+            // 26-hour clock running 1.08333333 times faster
+            const totalSeconds = (now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()) * 1.08333333;
+            const hours26 = Math.floor(totalSeconds / 3600) % 26;
+            const minutes26 = Math.floor((totalSeconds % 3600) / 60);
+            const seconds26 = Math.floor(totalSeconds % 60);
+            
+            document.getElementById('clock26').textContent = 
+                `${String(hours26).padStart(2, '0')}:${String(minutes26).padStart(2, '0')}:${String(seconds26).padStart(2, '0')}`;
+        }
+
+        // Update clocks every second
+        setInterval(updateClocks, 1000);
+        updateClocks(); // Initial call
+    </script>
+</body>
+</html>
